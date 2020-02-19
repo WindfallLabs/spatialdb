@@ -20,7 +20,7 @@ if sys.argv:
     # Calculate coverage stats
     elif sys.argv[1] == "coverage":
         os.system("coverage erase")
-        c = ("coverage run --source=db2 -m pytest --doctest-modules "
+        c = ("coverage run --source=spatialdb -m pytest --doctest-modules "
              "--doctest-glob='examples/*rst'")
         os.system(c)
         os.system("coverage html")
@@ -60,21 +60,21 @@ setup(
     ],
     description="Python Boilerplate contains all the boilerplate you need to create a Python package.",
     entry_points={
-        'console_scripts': [
-            'db2=db2.cli:main',
-        ],
+        #'console_scripts': [
+        #    'spatialdb=spatialdb.cli:main',
+        #],
     },
     install_requires=requirements,
     license="BSD license",
     long_description=readme,  # + '\n\n' + history,
     include_package_data=True,
-    keywords='db2',
-    name='db2',
-    packages=find_packages(include=['db2', 'db2.*']),
+    keywords='spatialdb',
+    name='spatialdb',
+    packages=find_packages(include=['spatialdb', 'spatialdb.*']),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/WindfallLabs/db2',
-    version='0.0.1',
+    url='https://github.com/WindfallLabs/spatialdb',
+    version='0.0.2',
     zip_safe=False,
 )
