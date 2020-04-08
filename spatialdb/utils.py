@@ -3,7 +3,10 @@
 import os
 import re
 import struct
-import urllib2
+try:
+    from urllib2 import urlopen
+except ImportError:
+    from urllib.request import urlopen
 
 import shapely
 
@@ -57,11 +60,13 @@ def get_sr_from_web(srid, auth, sr_format):
     # SpatiaLite (derive from PostGIS)
     if sr_format == "spatialite":
         site = site.replace("spatialite", "postgis")
-        data = urllib2.urlopen(site).read()
+
+    data = urlopen(site).read()
+    if hasattr(data, "decode"):
+        data = data.decode("utf8")
+    if sr_format == "spatialite":
         # The srid value has a leading 9 in the PostGIS INSERT statement
         data = re.sub("9{}".format(srid), str(srid), data, count=1)
-    else:
-        data = urllib2.urlopen(site).read()
     return data
 
 
@@ -89,10 +94,14 @@ class SpatiaLiteBlobElement(object):
 
         # Decode the Spatial Reference ID
         self.srid = "{}".format(struct.unpack(endian + 'i', array[2:6])[0])
+        self.geom_type = "{}".format(struct.unpack(endian + 'i', array[39:43])[0])
 
         # Create WKB from Endian (pos 1) and SpatiaLite-embeded WKB data
         # at pos 39+
-        self.wkb = str(geom_buffer[1] + array[39:-1])
+        try:
+            self.wkb = bytes(geom_buffer[1:2]) + array[39:-1]
+        except:  # TODO: naked for Python2.7
+            self.wkb = str(geom_buffer[1] + array[39:-1])
 
     @property
     def as_shapely(self):
